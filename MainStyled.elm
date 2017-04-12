@@ -36,16 +36,22 @@ type alias Card =
   , interval : Int
   }
 
+type Options
+  = EnglishFirst
+  | KoreanFirst
+
 type alias Model =
   { cards : List Card
   , backShown : Bool
   , menuShown : Bool
+  , options : Options
   }
 
 type Msg
   = Start
   | ShowBack
   | NextCard Bool
+  | ToggleOptions
 
 firstCard : List Card -> Card
 firstCard cards =
@@ -57,32 +63,52 @@ view : Model -> Html Msg
 view model =
   div [ mainStyle ] <|
     if model.menuShown then
-      [ viewMenu ]
+      [ viewMenu model.options ]
     else
       [ viewProgressBar model.cards
-      , viewCard (firstCard model.cards) model.backShown
+      , viewCard (firstCard model.cards) model.backShown model.options
       ]
 
-viewMenu : Html Msg
-viewMenu =
+viewMenu : Options -> Html Msg
+viewMenu options =
   div []
     [ div [ style [ ("text-align", "center") ] ]
         [ text "Korean Alphabet in 15 Minutes" ]
+    , case options of
+        EnglishFirst ->
+          div [ btnOptionStyle options, onClick ToggleOptions ] [ text "Front: 🇺🇸" ]
+        KoreanFirst ->
+          div [ btnOptionStyle options, onClick ToggleOptions ] [ text "Front: 🇰🇷" ]
     , button [ style btnStyle, onClick Start ] [ text "Start" ]
     ]
 
-viewCard : Card -> Bool -> Html Msg
-viewCard card backShown =
+viewCard : Card -> Bool -> Options -> Html Msg
+viewCard card backShown options =
   if backShown then
-    div []
-      [ div [ centerStyle ] [ text card.english ]
-      , div [ centerStyle ] [ text card.korean ]
-      , button [ style leftBtnStyle, onClick <| NextCard True ] [ text "✔" ]
-      , button [ style rightBtnStyle, onClick <| NextCard False ] [ text "✖" ]
-      ]
+    div [] <|
+      (case options of
+        EnglishFirst ->
+          [ div [ centerStyle ] [ text card.english ]
+          , div [ centerStyle ] [ text card.korean ]
+          ]
+        KoreanFirst ->
+          [ div [ centerStyle ] [ text card.korean ]
+          , div [ centerStyle ] [ text card.english ]
+          ]
+      ) ++
+        [ button [ style leftBtnStyle, onClick <| NextCard True ] [ text "✔" ]
+        , button [ style rightBtnStyle, onClick <| NextCard False ] [ text "✖" ]
+        ]
   else
     div []
-      [ div [ centerStyle ] [ text card.english ]
+      [ div [ centerStyle ]
+        [ text <|
+            case options of
+              EnglishFirst ->
+                card.english
+              KoreanFirst ->
+                card.korean
+        ]
       , button [ style btnStyle, onClick ShowBack ] [ text "Show" ]
       ]
 
@@ -151,6 +177,21 @@ rightBtnStyle =
     , ("background", "rgba(182, 0, 0, 0.8)")
     ]
 
+btnOptionStyle options =
+  style <|
+    btnStyle ++
+      [ ("text-align", "center")
+      , ("bottom", "90px")
+      , ("width", "95%")
+      , ("background",
+          case options of
+            EnglishFirst ->
+              "#77D27E"
+            KoreanFirst ->
+              "rgba(182, 0, 0, 0.8)"
+        )
+      ]
+
 progressBarStyle =
   style
     [ ("position", "relative")
@@ -213,6 +254,16 @@ update msg model =
               (List.drop newInterval otherCards)
       in
         { model | backShown = False, cards = newCards } ! []
+    ToggleOptions ->
+      let
+        newOptions =
+          case model.options of
+            EnglishFirst ->
+              KoreanFirst
+            KoreanFirst ->
+              EnglishFirst
+      in
+        { model | options = newOptions } ! []
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -220,7 +271,7 @@ subscriptions model =
 
 main =
   program
-    { init = Model initialCards False True ! []
+    { init = Model initialCards False True EnglishFirst ! []
     , view = view
     , update = update
     , subscriptions = subscriptions
