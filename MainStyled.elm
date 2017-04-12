@@ -128,7 +128,13 @@ update msg model =
             |> List.tail
             |> Maybe.withDefault []
         newInterval =
-          if isPassing then testedCard.interval + 3 else 1
+          if isPassing then
+            if testedCard.interval >= 13 then
+              testedCard.interval + 6
+            else
+              testedCard.interval + 3
+          else
+            1
         newCards =
           (List.take newInterval otherCards) ++
             [ { testedCard | interval = newInterval } ] ++
