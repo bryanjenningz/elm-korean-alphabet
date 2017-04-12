@@ -53,7 +53,10 @@ firstCard cards =
 
 view : Model -> Html Msg
 view model =
-  div [ mainStyle ] [ viewCard (firstCard model.cards) model.backShown ]
+  div [ mainStyle ]
+    [ viewProgressBar model.cards
+    , viewCard (firstCard model.cards) model.backShown
+    ]
 
 viewCard : Card -> Bool -> Html Msg
 viewCard card backShown =
@@ -68,6 +71,27 @@ viewCard card backShown =
     div []
       [ div [ centerStyle ] [ text card.english ]
       , button [ style btnStyle, onClick ShowBack ] [ text "Show" ]
+      ]
+
+viewProgressBar : List Card -> Html Msg
+viewProgressBar cards =
+  let
+    passed =
+      cards
+        |> List.filter (\card -> card.interval > 1)
+        |> List.length
+    total =
+      cards |> List.length
+    passedPercentage =
+      round <| (toFloat passed) / (toFloat total) * 100
+    unpassedPercentage =
+      100 - passedPercentage
+  in
+    div [ progressBarStyle ]
+      [ div [ progressBarLeftStyle passedPercentage ] []
+      , div [ progressBarRightStyle unpassedPercentage ] []
+      , div [ progressBarTextStyle ]
+          [ text <| (toString passed) ++ " / " ++ (toString total) ]
       ]
 
 mainStyle =
@@ -112,6 +136,39 @@ rightBtnStyle =
     [ ("width", "50%")
     , ("right", "0")
     , ("background", "rgba(182, 0, 0, 0.8)")
+    ]
+
+progressBarStyle =
+  style
+    [ ("position", "relative")
+    ]
+
+progressBarLeftStyle : Int -> Html.Attribute Msg
+progressBarLeftStyle percentage =
+  style
+    [ ("position", "absolute")
+    , ("background", "#77D27E")
+    , ("left", "0")
+    , ("top", "0")
+    , ("height", "70px")
+    , ("width", (toString percentage) ++ "%")
+    ]
+
+progressBarRightStyle : Int -> Html.Attribute Msg
+progressBarRightStyle percentage =
+  style
+    [ ("position", "absolute")
+    , ("background", "rgba(182, 0, 0, 0.8)")
+    , ("right", "0")
+    , ("top", "0")
+    , ("height", "70px")
+    , ("width", (toString percentage) ++ "%")
+    ]
+
+progressBarTextStyle =
+  style
+    [ ("text-align", "center")
+    , ("position", "relative")
     ]
 
 update : Msg -> Model -> ( Model, Cmd Msg )
