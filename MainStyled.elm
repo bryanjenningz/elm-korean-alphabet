@@ -11,7 +11,7 @@ initialCards =
   , { korean = "ㅁ", english = "m", interval = 1 }
   , { korean = "ㅂ", english = "b", interval = 1 }
   , { korean = "ㅅ", english = "s", interval = 1 }
-  , { korean = "ㅇ", english = "null (initial)/ng (final)", interval = 1 }
+  , { korean = "ㅇ", english = "null (initial), ng (final)", interval = 1 }
   , { korean = "ㅈ", english = "j", interval = 1 }
   , { korean = "ㅊ", english = "ch", interval = 1 }
   , { korean = "ㅋ", english = "k", interval = 1 }
@@ -73,10 +73,10 @@ viewCard card backShown =
 mainStyle =
   style
     [ ("font-family", "Arial")
-    , ("font-size", "80px")
+    , ("font-size", "60px")
     , ("font-weight", "900")
     , ("color", "#000000")
-    , ("background", "#eeeeee")
+    , ("background", "#f1f1f1")
     , ("width", "400px")
     , ("height", "600px")
     , ("margin", "auto")
@@ -90,9 +90,9 @@ centerStyle =
     ]
 
 btnStyle =
-  [ ("font-size", "80px")
+  [ ("font-size", "60px")
   , ("font-weight", "900")
-  , ("background", "cyan")
+  , ("background", "#1bb8d6")
   , ("border-width", "0")
   , ("padding", "10px")
   , ("position", "absolute")
@@ -104,14 +104,14 @@ leftBtnStyle =
   btnStyle ++
     [ ("width", "50%")
     , ("left", "0")
-    , ("background", "rgba(255, 0, 0, 0.81)")
+    , ("background", "#77D27E")
     ]
 
 rightBtnStyle =
   btnStyle ++
     [ ("width", "50%")
     , ("right", "0")
-    , ("background", "rgb(0, 255, 90)")
+    , ("background", "rgba(182, 0, 0, 0.8)")
     ]
 
 update : Msg -> Model -> ( Model, Cmd Msg )
