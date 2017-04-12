@@ -39,10 +39,12 @@ type alias Card =
 type alias Model =
   { cards : List Card
   , backShown : Bool
+  , menuShown : Bool
   }
 
 type Msg
-  = ShowBack
+  = Start
+  | ShowBack
   | NextCard Bool
 
 firstCard : List Card -> Card
@@ -53,9 +55,20 @@ firstCard cards =
 
 view : Model -> Html Msg
 view model =
-  div [ mainStyle ]
-    [ viewProgressBar model.cards
-    , viewCard (firstCard model.cards) model.backShown
+  div [ mainStyle ] <|
+    if model.menuShown then
+      [ viewMenu ]
+    else
+      [ viewProgressBar model.cards
+      , viewCard (firstCard model.cards) model.backShown
+      ]
+
+viewMenu : Html Msg
+viewMenu =
+  div []
+    [ div [ style [ ("text-align", "center") ] ]
+        [ text "Korean Alphabet in 15 Minutes" ]
+    , button [ style btnStyle, onClick Start ] [ text "Start" ]
     ]
 
 viewCard : Card -> Bool -> Html Msg
@@ -174,6 +187,8 @@ progressBarTextStyle =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
+    Start ->
+      { model | menuShown = False, backShown = False } ! []
     ShowBack ->
       { model | backShown = True } ! []
     NextCard isPassing ->
@@ -205,7 +220,7 @@ subscriptions model =
 
 main =
   program
-    { init = Model initialCards False ! []
+    { init = Model initialCards False True ! []
     , view = view
     , update = update
     , subscriptions = subscriptions
