@@ -11,7 +11,7 @@ initialCards =
   , { korean = "ㅁ", english = "m", interval = 1 }
   , { korean = "ㅂ", english = "b", interval = 1 }
   , { korean = "ㅅ", english = "s", interval = 1 }
-  , { korean = "ㅇ", english = "null (initial), ng (final)", interval = 1 }
+  , { korean = "ㅇ", english = "silent (top), ng (bottom)", interval = 1 }
   , { korean = "ㅈ", english = "j", interval = 1 }
   , { korean = "ㅊ", english = "ch", interval = 1 }
   , { korean = "ㅋ", english = "k", interval = 1 }
