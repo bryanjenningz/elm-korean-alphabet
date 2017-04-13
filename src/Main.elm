@@ -60,6 +60,7 @@ type Msg
     | ShowBack
     | NextCard Bool
     | ToggleOptions
+    | Reset
 
 
 firstCard : List Card -> Card
@@ -85,6 +86,7 @@ viewMenu options =
     div []
         [ div [ style [ ( "text-align", "center" ) ] ]
             [ text "Korean Alphabet in 15 Minutes" ]
+        , button [ btnResetStyle, onClick Reset ] [ text "Reset Data" ]
         , case options of
             EnglishFirst ->
                 div [ btnOptionStyle options, onClick ToggleOptions ] [ text "Front: 🇺🇸" ]
@@ -201,6 +203,14 @@ rightBtnStyle =
            , ( "right", "0" )
            , ( "background", "rgba(182, 0, 0, 0.8)" )
            ]
+
+
+btnResetStyle =
+    style <|
+        btnStyle
+            ++ [ ( "text-align", "center" )
+               , ( "bottom", "185px" )
+               ]
 
 
 btnOptionStyle options =
@@ -326,6 +336,11 @@ update msg model =
                             EnglishFirst
             in
                 { model | options = newOptions } ! []
+
+        Reset ->
+            ( { model | cards = initialCards, options = EnglishFirst }
+            , save <| SaveData initialCards "EnglishFirst"
+            )
 
 
 port save : SaveData -> Cmd msg
