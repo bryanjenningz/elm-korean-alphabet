@@ -1,4 +1,6 @@
-import Html exposing (Html, program, div, text, button)
+port module Main exposing (..)
+
+import Html exposing (Html, programWithFlags, div, text, button)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
 
@@ -265,7 +267,17 @@ update msg model =
             [ { testedCard | interval = newInterval } ] ++
               (List.drop newInterval otherCards)
       in
-        { model | backShown = False, cards = newCards } ! []
+        ( { model | backShown = False, cards = newCards }
+        , save <|
+            SaveData
+              newCards
+              (case model.options of
+                KoreanFirst ->
+                  "KoreanFirst"
+                _ ->
+                  "EnglishFirst"
+              )
+        )
     ToggleOptions ->
       let
         newOptions =
@@ -277,13 +289,39 @@ update msg model =
       in
         { model | options = newOptions } ! []
 
+port save : SaveData -> Cmd msg
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
 
+type alias SaveData =
+  { cards : List Card
+  , options: String
+  }
+
+type alias Flags =
+  { cards : Maybe (List Card)
+  , options : Maybe String
+  }
+
+init : Flags -> ( Model, Cmd Msg )
+init { cards, options } =
+  Model
+    (cards |> Maybe.withDefault initialCards)
+    False
+    True
+    (case options of
+      Just "KoreanFirst" ->
+        KoreanFirst
+      _ ->
+        EnglishFirst
+    )
+  ! []
+
 main =
-  program
-    { init = Model initialCards False True EnglishFirst ! []
+  programWithFlags
+    { init = init
     , view = view
     , update = update
     , subscriptions = subscriptions
