@@ -4,3 +4,5 @@
 <img src="menu-screen.png" width="200" height="300" />
 <img src="front-screen.png" width="200" height="300" />
 <img src="back-screen.png" width="200" height="300" />
+<img src="front-screen-2.png" width="200" height="300" />
+<img src="back-screen-2.png" width="200" height="300" />
