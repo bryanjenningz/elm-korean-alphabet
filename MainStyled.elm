@@ -49,6 +49,7 @@ type alias Model =
 
 type Msg
   = Start
+  | Stop
   | ShowBack
   | NextCard Bool
   | ToggleOptions
@@ -129,6 +130,7 @@ viewProgressBar cards =
     div [ progressBarStyle ]
       [ div [ progressBarLeftStyle passedPercentage ] []
       , div [ progressBarRightStyle unpassedPercentage ] []
+      , div [ leftArrowStyle, onClick Stop ] [ text "◀" ]
       , div [ progressBarTextStyle ]
           [ text <| (toString passed) ++ " / " ++ (toString total) ]
       ]
@@ -219,6 +221,14 @@ progressBarRightStyle percentage =
     , ("width", (toString percentage) ++ "%")
     ]
 
+leftArrowStyle =
+  style
+    [ ("position", "absolute")
+    , ("font-size", "45px")
+    , ("left", "10px")
+    , ("z-index", "1")
+    ]
+
 progressBarTextStyle =
   style
     [ ("text-align", "center")
@@ -230,6 +240,8 @@ update msg model =
   case msg of
     Start ->
       { model | menuShown = False, backShown = False } ! []
+    Stop ->
+      { model | menuShown = True, backShown = False } ! []
     ShowBack ->
       { model | backShown = True } ! []
     NextCard isPassing ->
