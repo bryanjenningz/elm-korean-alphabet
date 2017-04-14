@@ -12,13 +12,13 @@
       var node = document.querySelector('#main');
 
       var app = Elm.Main.embed(node, {
-        cards: JSON.parse(localStorage['cards'] || 'null'),
-        options: JSON.parse(localStorage['options'] || 'null'),
+        cards: JSON.parse(localStorage.cards || 'null'),
+        frontLanguage: JSON.parse(localStorage.frontLanguage || 'null'),
       });
 
       app.ports.save.subscribe(function(saveData) {
-        localStorage['cards'] = JSON.stringify(saveData.cards);
-        localStorage['options'] = JSON.stringify(saveData.options);
+        localStorage.cards = JSON.stringify(saveData.cards);
+        localStorage.frontLanguage = JSON.stringify(saveData.frontLanguage);
       });
     </script>
   </body>

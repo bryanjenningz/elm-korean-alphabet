@@ -41,16 +41,16 @@ type alias Card =
     }
 
 
-type Options
-    = EnglishFirst
-    | KoreanFirst
+type Language
+    = English
+    | Korean
 
 
 type alias Model =
     { cards : List Card
     , backShown : Bool
     , menuShown : Bool
-    , options : Options
+    , frontLanguage : Language
     }
 
 
@@ -59,7 +59,7 @@ type Msg
     | Stop
     | ShowBack
     | NextCard Bool
-    | ToggleOptions
+    | ToggleFrontLanguage
     | Reset
 
 
@@ -74,40 +74,40 @@ view : Model -> Html Msg
 view model =
     div [ mainStyle ] <|
         if model.menuShown then
-            [ viewMenu model.options ]
+            [ viewMenu model.frontLanguage ]
         else
             [ viewProgressBar model.cards
-            , viewCard (firstCard model.cards) model.backShown model.options
+            , viewCard (firstCard model.cards) model.backShown model.frontLanguage
             ]
 
 
-viewMenu : Options -> Html Msg
-viewMenu options =
+viewMenu : Language -> Html Msg
+viewMenu frontLanguage =
     div []
         [ div [ style [ ( "text-align", "center" ) ] ]
             [ text "Korean Alphabet in 15 Minutes" ]
         , button [ btnResetStyle, onClick Reset ] [ text "Reset Data" ]
-        , case options of
-            EnglishFirst ->
-                div [ btnOptionStyle options, onClick ToggleOptions ] [ text "Front: 🇺🇸" ]
+        , case frontLanguage of
+            English ->
+                div [ btnFrontLanguageStyle frontLanguage, onClick ToggleFrontLanguage ] [ text "Front: 🇺🇸" ]
 
-            KoreanFirst ->
-                div [ btnOptionStyle options, onClick ToggleOptions ] [ text "Front: 🇰🇷" ]
+            Korean ->
+                div [ btnFrontLanguageStyle frontLanguage, onClick ToggleFrontLanguage ] [ text "Front: 🇰🇷" ]
         , button [ style btnStyle, onClick Start ] [ text "Start" ]
         ]
 
 
-viewCard : Card -> Bool -> Options -> Html Msg
-viewCard card backShown options =
+viewCard : Card -> Bool -> Language -> Html Msg
+viewCard card backShown frontLanguage =
     if backShown then
         div [] <|
-            (case options of
-                EnglishFirst ->
+            (case frontLanguage of
+                English ->
                     [ div [ centerStyle ] [ text card.english ]
                     , div [ centerStyle ] [ text card.korean ]
                     ]
 
-                KoreanFirst ->
+                Korean ->
                     [ div [ centerStyle ] [ text card.korean ]
                     , div [ centerStyle ] [ text card.english ]
                     ]
@@ -119,11 +119,11 @@ viewCard card backShown options =
         div []
             [ div [ centerStyle ]
                 [ text <|
-                    case options of
-                        EnglishFirst ->
+                    case frontLanguage of
+                        English ->
                             card.english
 
-                        KoreanFirst ->
+                        Korean ->
                             card.korean
                 ]
             , button [ style btnStyle, onClick ShowBack ] [ text "Show" ]
@@ -213,18 +213,18 @@ btnResetStyle =
                ]
 
 
-btnOptionStyle options =
+btnFrontLanguageStyle frontLanguage =
     style <|
         btnStyle
             ++ [ ( "text-align", "center" )
                , ( "bottom", "90px" )
                , ( "width", "95%" )
                , ( "background"
-                 , case options of
-                    EnglishFirst ->
+                 , case frontLanguage of
+                    English ->
                         "#77D27E"
 
-                    KoreanFirst ->
+                    Korean ->
                         "rgba(182, 0, 0, 0.8)"
                  )
                ]
@@ -316,30 +316,30 @@ update msg model =
                 , save <|
                     SaveData
                         newCards
-                        (case model.options of
-                            KoreanFirst ->
-                                "KoreanFirst"
+                        (case model.frontLanguage of
+                            Korean ->
+                                "Korean"
 
                             _ ->
-                                "EnglishFirst"
+                                "English"
                         )
                 )
 
-        ToggleOptions ->
+        ToggleFrontLanguage ->
             let
-                newOptions =
-                    case model.options of
-                        EnglishFirst ->
-                            KoreanFirst
+                newFrontLanguage =
+                    case model.frontLanguage of
+                        English ->
+                            Korean
 
-                        KoreanFirst ->
-                            EnglishFirst
+                        Korean ->
+                            English
             in
-                { model | options = newOptions } ! []
+                { model | frontLanguage = newFrontLanguage } ! []
 
         Reset ->
-            ( { model | cards = initialCards, options = EnglishFirst }
-            , save <| SaveData initialCards "EnglishFirst"
+            ( { model | cards = initialCards, frontLanguage = English }
+            , save <| SaveData initialCards "English"
             )
 
 
@@ -353,28 +353,28 @@ subscriptions model =
 
 type alias SaveData =
     { cards : List Card
-    , options : String
+    , frontLanguage : String
     }
 
 
 type alias Flags =
     { cards : Maybe (List Card)
-    , options : Maybe String
+    , frontLanguage : Maybe String
     }
 
 
 init : Flags -> ( Model, Cmd Msg )
-init { cards, options } =
+init { cards, frontLanguage } =
     Model
         (cards |> Maybe.withDefault initialCards)
         False
         True
-        (case options of
-            Just "KoreanFirst" ->
-                KoreanFirst
+        (case frontLanguage of
+            Just "Korean" ->
+                Korean
 
             _ ->
-                EnglishFirst
+                English
         )
         ! []
 
