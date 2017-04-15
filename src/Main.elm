@@ -76,15 +76,15 @@ firstCard cards =
 
 
 view : Model -> Html Msg
-view model =
+view { location, frontLanguage, cards, backShown } =
     div [ mainStyle ] <|
-        case model.location of
+        case location of
             LocationHome ->
-                [ viewMenu model.frontLanguage ]
+                [ viewMenu frontLanguage ]
 
             LocationCard ->
-                [ viewProgressBar model.cards
-                , viewCard (firstCard model.cards) model.backShown model.frontLanguage
+                [ viewProgressBar cards
+                , viewCard (firstCard cards) backShown frontLanguage
                 ]
 
 
@@ -284,7 +284,7 @@ progressBarTextStyle =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg ({ cards, frontLanguage } as model) =
     case msg of
         Start ->
             { model | location = LocationCard, backShown = False } ! []
@@ -298,10 +298,10 @@ update msg model =
         NextCard isPassing ->
             let
                 testedCard =
-                    firstCard model.cards
+                    firstCard cards
 
                 otherCards =
-                    model.cards
+                    cards
                         |> List.tail
                         |> Maybe.withDefault []
 
@@ -323,7 +323,7 @@ update msg model =
                 , save <|
                     SaveData
                         newCards
-                        (case model.frontLanguage of
+                        (case frontLanguage of
                             Korean ->
                                 "Korean"
 
@@ -335,7 +335,7 @@ update msg model =
         ToggleFrontLanguage ->
             let
                 newFrontLanguage =
-                    case model.frontLanguage of
+                    case frontLanguage of
                         English ->
                             Korean
 
