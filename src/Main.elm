@@ -46,10 +46,15 @@ type Language
     | Korean
 
 
+type Location
+    = LocationHome
+    | LocationCard
+
+
 type alias Model =
     { cards : List Card
     , backShown : Bool
-    , menuShown : Bool
+    , location : Location
     , frontLanguage : Language
     }
 
@@ -73,12 +78,14 @@ firstCard cards =
 view : Model -> Html Msg
 view model =
     div [ mainStyle ] <|
-        if model.menuShown then
-            [ viewMenu model.frontLanguage ]
-        else
-            [ viewProgressBar model.cards
-            , viewCard (firstCard model.cards) model.backShown model.frontLanguage
-            ]
+        case model.location of
+            LocationHome ->
+                [ viewMenu model.frontLanguage ]
+
+            LocationCard ->
+                [ viewProgressBar model.cards
+                , viewCard (firstCard model.cards) model.backShown model.frontLanguage
+                ]
 
 
 viewMenu : Language -> Html Msg
@@ -280,10 +287,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Start ->
-            { model | menuShown = False, backShown = False } ! []
+            { model | location = LocationCard, backShown = False } ! []
 
         Stop ->
-            { model | menuShown = True, backShown = False } ! []
+            { model | location = LocationHome, backShown = False } ! []
 
         ShowBack ->
             { model | backShown = True } ! []
@@ -368,7 +375,7 @@ init { cards, frontLanguage } =
     Model
         (cards |> Maybe.withDefault initialCards)
         False
-        True
+        LocationHome
         (case frontLanguage of
             Just "Korean" ->
                 Korean
